@@ -76,3 +76,10 @@
   - **数据一致性**
   - 系统集成测试
   - 性能监控
+
+### 8. **ribbon和feign区别**
+
+- Ribbon添加maven依赖 spring-starter-ribbon 使用**@RibbonClient(value="服务名称") 使用RestTemplate调用远程服务对应的方法**
+- feign添加maven依赖 spring-starter-feign 服务提供方提供对外接口 调用方使用 在接口上使用**@FeignClient("指定服务名")**
+- 调用方式不同，Ribbon需要自己构建http请求，**模拟http请求然后使用RestTemplate发送给其他服务**，步骤相当繁琐。
+- Feign则是在Ribbon的基础上进行了一次改进，**采用接口的方式，将需要调用的其他服务的方法定义成抽象方法即可，**不需要自己构建http请求。不过要注意的是抽象方法的注解、方法签名要和提供服务的方法完全一致。
