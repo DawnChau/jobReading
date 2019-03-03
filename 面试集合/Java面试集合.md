@@ -50,7 +50,7 @@
 - **-XX:NewSize**：新生代内存
 - **-Xmn**：新生代最大内存
 - **-XX:SurvivorRatio：**：一个新生代与一个Survivor的比值
-- **-XX:NewRatio**：老年代与新生代的比值，默认为4，在设置了**-Xmn**的情况下，该值会被忽略
+- **-XX:NewRatio**：老年代与新生代的比值，默认为4，在设置了 **-Xmn** 的情况下，该值会被忽略
 - **XX:OldSize**：老年代的大小
 - **-XX:PermSize**：永久带的大小
 
