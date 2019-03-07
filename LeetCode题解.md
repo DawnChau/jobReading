@@ -633,6 +633,301 @@ public static int divide(int dividend, int divisor) {
     }
 ```
 
+### 033 在旋转过的数组里查找
+
+- 核心思想二分
+- 先判断哪个半区是正常顺序
+- 每个半区分三种情况来讨论
+- 注意判断半区要用else而不是else if
+
+```java
+public int search(int[] nums, int target) {
+        int left = 0;
+        int right = nums.length - 1;
+
+
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+
+
+            if(left==right && nums[left]!=target)
+                break;
+            // 忽略下文中的等号判断
+            if (nums[mid] == target)
+                return mid;
+            if (nums[right] == target)
+                return right;
+            if (nums[left] == target)
+                return left;
+
+            // 先判断哪个区是增序的
+            if (nums[mid]>nums[left]) {
+                // 左半区是增序的
+                if (target > nums[mid]) {
+                    // 属于右半区
+                    left = mid + 1;
+                } else {
+                    if(target < nums[left]){
+                        // 属于右半区
+                        left = mid + 1;
+                    }else{
+                        // 属于左半区
+                        right = mid - 1;
+                    }
+                }
+            } else {
+                // 这里要包括nums[mid]==nums[left] 和 nums[mid] < nums[left]
+                // 右半区是增序的
+                if (target < nums[mid]) {
+                    // 属于左半区
+                    right = mid - 1;
+                } else {
+                    if(target>nums[right]){
+                        // 属于左半区
+                        right = mid - 1;
+                    }else{
+                        // 属于右半区
+                        left = mid + 1;
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+```
+
+### 034 查找一个元素在数组里出现的首末位置
+
+- 先用二分查找到这个数
+- 之后将这个数往左右扩展，找出范围
+
+```java
+public int[] searchRange(int[] nums, int target) {
+        if(nums == null || nums.length == 0)
+            return new int[]{-1,-1};
+        int left = 0;
+        int right = nums.length-1;
+        while(left<=right){
+            int mid = left+(right-left)/2;
+            if(target==nums[mid])
+                return getRange(nums,mid);
+            else if(target>nums[mid]){
+                left = mid+1;
+            }else{
+                right = mid-1;
+            }
+        }
+        return new int[]{-1,-1};
+    }
+    
+    private int[] getRange(int[] nums, int mid) {
+        int left = mid;
+        int right = mid;
+        int target = nums[mid];
+        while(left>=0 && nums[left]==target)
+            left--;
+        while(right<nums.length && nums[right]==target)
+            right++;
+        return new int[]{++left,--right};
+    }
+```
+
+### 036 验证数独的有效性【HashSet】
+
+- 用Set来判断是否出现过
+- 按照规则，横着，竖着，九宫格这样验证一遍即可
+
+```java
+public boolean isValidSudoku(char[][] board) {
+        for(int i = 0;i<board.length;i++){
+            Set<Character> set = new HashSet<>();
+            for(int j = 0;j<board[0].length;j++){
+                if(board[i][j]== '.')
+                    continue;
+                if(!set.add(board[i][j]))
+                    return false;
+            }
+        }
+
+        for(int i = 0;i<board[0].length;i++){
+            Set<Character> set = new HashSet<>();
+            for(int j = 0;j<board.length;j++){
+                if(board[j][i]== '.')
+                    continue;
+                if(!set.add(board[j][i]))
+                    return false;
+            }
+        }
+        for(int row = 0;row<3;row++){
+            for(int col = 0;col<3;col++){
+                Set<Character> set = new HashSet<>();
+                for(int i = 0;i<3;i++){
+                    for(int j = 0;j<3;j++){
+                        if(board[i+row*3][j+col*3]== '.')
+                            continue;
+                        if(!set.add(board[i+row*3][j+col*3]))
+                            return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+```
+
+### 038 数并说出来
+
+- 遍历字符串，相等就加起来，然后最后把个数和该字符串一起形成一个新的字符串
+
+```java
+public String countAndSay(int n) {
+        if(n == 1)
+            return "1";
+        StringBuilder sb = new StringBuilder("1");
+        for(int j = 1;j<n;j++){
+            char l = sb.charAt(0);
+            int count = 0;
+            StringBuilder newSb = new StringBuilder();
+            for(int i = 0;i<sb.length();i++){
+                char c = sb.charAt(i);
+                if(c == l){
+                    count++;
+                }else{
+                    newSb.append(""+count+l);
+                    count = 1;
+                    l = c;
+                }
+                if(i == sb.length()-1){
+                    newSb.append(""+count+l);
+                }
+            }
+            sb = newSb;
+        }
+        return sb.toString();
+    }
+```
+
+### 046 全排列
+
+- 第一步：确定该位置
+- DFS该位置之后的元素
+- 递归结束后再把该位置交换回来
+
+```java
+public List<List<Integer>> permute(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+        if(nums.length == 0)
+            return res;
+        // 开始深度优先遍历
+        dfs(res,nums,0);
+        return res;
+    }
+    
+    private void dfs(List<List<Integer>> res, int[] nums, int index) {
+        // 深度遍历到底了
+        if(index == nums.length){
+            List<Integer> temp = new ArrayList<>();
+            for(int i = 0;i<nums.length;i++){
+                temp.add(nums[i]);
+            }
+            res.add(temp);
+            return;
+        }
+        for (int i = index;i<nums.length;i++){
+            // 确定该位置
+            swap(nums,index,i);
+            dfs(res,nums,index+1);
+            // 再换回来
+            swap(nums,index,i);
+        }
+
+    }
+
+    private void swap(int[] nums, int index, int i) {
+        int temp = nums[index];
+        nums[index] = nums[i];
+        nums[i] = temp;
+    }
+```
+
+### 048 90度顺时针旋转矩阵
+
+- 按对角线翻转
+- 按照竖着的中轴线翻转
+
+```java
+public void rotate(int[][] matrix) {
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = i; j < matrix[0].length; j++) {
+                int temp = matrix[i][j];
+                matrix[i][j] = matrix[j][i];
+                matrix[j][i] = temp;
+            }
+        }
+
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < (matrix[0].length+1)/2; j++) {
+                int temp = matrix[i][j];
+                matrix[i][j] = matrix[i][matrix.length-j-1];
+                matrix[i][matrix.length-j-1] = temp;
+            }
+        }
+    }
+```
+
+### 049 把由相同字符组成的单词分组【HashMap】
+
+- 主要是把每个单词进行排序，这样顺序打乱也一样了
+- HashMap 存放  排序后的单词，原单词的list
+
+```java
+public List<List<String>> groupAnagrams(String[] strs) {
+        List<List<String>> res = new ArrayList<>();
+        HashMap<String,List<String>> map = new HashMap<>();
+        for(int i = 0;i<strs.length;i++){
+            char[] temp = strs[i].toCharArray();
+            Arrays.sort(temp);
+            String newStr = new String(temp);
+            if(map.containsKey(newStr)){
+                List<String> tempList = map.get(newStr);
+                tempList.add(strs[i]);
+                map.put(newStr,tempList);
+            }else{
+                List<String> tempList = new ArrayList<>();
+                tempList.add(strs[i]);
+                map.put(newStr,tempList);
+            }
+        }
+        Iterator<String> it = map.keySet().iterator();
+        while(it.hasNext()){
+            res.add(map.get(it.next()));
+        }
+        return res;
+    }
+```
+
+### 050 求一个数的幂
+
+- 除二取余，余数为1就乘到ans上
+
+```java
+public double myPow(double x, int n) {
+        if(n == 0)
+            return 1.0;
+        double ans = 1.0;
+        for(int i = n;i!=0;i/=2){
+            // 奇数时候过来乘一下子
+            if(i%2!=0)
+                ans*=x;
+            x*=x;
+        }
+        if(n<0)
+            return 1/ans;
+        else
+            return ans;
+    }
+```
+
 
 
 
