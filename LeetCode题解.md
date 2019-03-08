@@ -928,6 +928,240 @@ public double myPow(double x, int n) {
     }
 ```
 
+### 053 最大和子数组
+
+- 把每个数加起来，如果小于0，则和重置为0
+
+```java
+public int maxSubArray(int[] nums) {
+        int sum = 0;
+        int max = Integer.MIN_VALUE;
+        for(int i = 0;i<nums.length;i++){
+            sum = sum<0?0:sum;
+            sum+=nums[i];
+            max = Math.max(sum,max);
+        }
+        return max;
+    }
+```
+
+### 055 看看能否跳到最后一个位置
+
+- 从最后一个位置开始遍历
+- 如果遇到比之间的差值大的，就代表着能够跳到这个位置上，将最后一个位置置为该位置
+- 如果跳到头部还不行，则表示不能跳到最后一个位置
+
+```java
+public boolean canJump(int[] nums) {
+        int lastIndex = nums.length-1;
+        for(int i = lastIndex-1;i>=0;i--){
+            if(nums[i]>=lastIndex-i)
+                lastIndex = i;
+            if(i == 0 && nums[i]<lastIndex-i)
+                return false;
+        }
+        return true;
+    }
+```
+
+### 062 独一无二的路径
+
+- 公式 `dp[i][j] = dp[i-1][j]+dp[i][j-1]`
+
+```java
+public int uniquePaths(int m, int n) {
+        int[][] dp = new int[m+1][n+1];
+        for(int i = 1;i<=n;i++) {
+            dp[1][i] = 1;
+        }
+        for(int i = 1;i<=m;i++) {
+            dp[i][1] = 1;
+        }
+        for(int i = 2;i<=m;i++){
+            for(int j = 2;j<=n;j++){
+                dp[i][j] = dp[i-1][j]+dp[i][j-1];
+            }
+        }
+        return dp[m][n];
+    }
+```
+
+### 066 数组加一
+
+- 如果最后一个数小于9，直接把最后一个数加一
+- 如果最后一个数是9，则往前进位，直到进位到最前边的元素【此时全为9】
+
+```java
+public int[] plusOne(int[] digits) {
+        if(digits[digits.length-1]<9){
+            digits[digits.length-1]++;
+            return digits;
+        }else{
+            int[] res = new int[digits.length+1];
+            for(int i = digits.length-1;i>=0;i--){
+                if(digits[i]==9){
+                    digits[i]=0;
+                }else{
+                    digits[i]++;
+                    return digits;
+                }
+            }
+            res[0]=1;
+            return res;
+        }
+    }
+```
+
+### 069 求开方
+
+- 遍历一遍即可，注意用long
+
+```java
+public int mySqrt(int x) {
+        for(long i = 1;;i++){
+            long m = i*i;
+            long n = (i+1)*(i+1);
+            if(x>=m && x <n)
+                return (int)i;
+        }
+    }
+```
+
+### 070 求爬楼梯的种数
+
+- 斐波那契数列
+
+```java
+public int climbStairs(int n) {
+        if( n ==1 || n ==2 )
+            return n;
+        int[] dp = new int[n+1];
+        dp[1] = 1;
+        dp[2] = 2;
+        for(int i = 3;i<n+1;i++){
+            dp[i] = dp[i-1]+dp[i-2];
+        }
+        return dp[n];
+    }
+```
+
+### 073 设置矩阵的横竖为0
+
+- 用额外的数组存哪个位置是0
+- 然后遍历原数行列组置为0
+
+```java
+public void setZeroes(int[][] matrix) {
+        int[][] temp = new int[matrix.length][matrix[0].length];
+        for(int i = 0;i<matrix.length;i++){
+            for(int j = 0;j<matrix[0].length;j++){
+                if(matrix[i][j]==0)
+                    temp[i][j]=1;
+            }
+        }
+
+        for(int i = 0;i<matrix.length;i++){
+            for(int j = 0;j<matrix[0].length;j++){
+                if(temp[i][j]==1) {
+                    for (int m = 0; m < matrix[0].length; m++) {
+                        matrix[i][m] = 0;
+                    }
+                    for (int m = 0; m < matrix.length; m++) {
+                        matrix[m][j] = 0;
+                    }
+                }
+            }
+        }
+    }
+```
+
+### 078 输出所有的子集
+
+- 思路是先加单个的
+- 然后在之前list的基础上再多加一个
+
+```java
+public List<List<Integer>> subsets(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+        res.add(new ArrayList<Integer>());
+
+        for (int i = 0;i<nums.length;i++){
+            List<Integer> temp = new ArrayList<>();
+            temp.add(nums[i]);
+            subsets(res,temp,nums,i);
+        }
+        return res;
+    }
+    private void subsets(List<List<Integer>> res, List<Integer> list, int[] nums,int index){
+        res.add(list);
+        for(int j = index +1 ;j<nums.length;j++){
+            List<Integer> temp = new ArrayList<>(list);
+            temp.add(nums[j]);
+            subsets(res,temp,nums,j);
+        }
+    }
+```
+
+### 088 合并有序的数组
+
+- 需要有一个数组暂存数组1
+- 然后双指针将原来的数组填满
+
+```java
+public void merge(int[] nums1, int m, int[] nums2, int n) {
+        // 暂存nums1
+        int[] newArray = Arrays.copyOfRange(nums1,0,m);
+        int i = 0;
+        int j = 0;
+        int index = 0;
+        while(i<m && j<n){
+            if(newArray[i]<nums2[j]){
+                nums1[index++] = newArray[i++];
+            }else{
+                nums1[index++] = nums2[j++];
+            }
+        }
+        if(i == m ){
+            while(j<n){
+                nums1[index++] = nums2[j++];
+            }
+        }else{
+            while(i<m){
+                nums1[index++] = newArray[i++];
+            }
+        }
+    }
+```
+
+### 094 二叉树中序遍历（非递归）【Stack】
+
+- 将当前节点和当前节点压入栈
+- 当前节点= 左孩子
+- 出栈
+- 当前节点 = 右孩子
+
+```java
+public List<Integer> inorderTraversal(TreeNode root) {
+        List<Integer> res = new ArrayList<>();
+        Stack<TreeNode> stack = new Stack<>();
+        if(root==null)
+            return res;
+        TreeNode cur = root;
+        while(cur!=null || !stack.isEmpty()){
+            while(cur!=null){
+                stack.push(cur);
+                cur = cur.left;
+            }
+            cur = stack.pop();
+            res.add(cur.val);
+            cur = cur.right;
+        }
+        return res;
+    }
+```
+
+
+
 
 
 
