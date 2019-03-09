@@ -1160,6 +1160,169 @@ public List<Integer> inorderTraversal(TreeNode root) {
     }
 ```
 
+### 101 判断是佛是对称树
+
+- 叶子节点返回true
+- 判断左左和右右是否对称，左右和右左是否对称
+
+```java
+public boolean isSymmetric(TreeNode root) {
+         if(root==null)
+            return true;
+        return isSymmetric(root.left,root.right);
+    }
+    
+    public boolean isSymmetric(TreeNode left, TreeNode right){
+        if(left== null && right==null)
+            return true;
+        if((left==null && right !=null) ||(left!=null && right==null)|| (left.val!=right.val))
+            return false;
+        return isSymmetric(left.left,right.right) && isSymmetric(right.left,left.right);
+    }
+```
+
+### 104 二叉树的最大深度
+
+- 返回左右子树的最高深度+1
+
+```java
+public int maxDepth(TreeNode root) {
+        if(root==null)
+            return 0;
+        return Math.max(maxDepth(root.left),maxDepth(root.right))+1;
+    }
+```
+
+### 108 将有序数组转化为二叉搜索树
+
+- 将中点构造为二叉搜索树
+- 左右子树分别构造二叉搜索树
+
+```java
+public TreeNode sortedArrayToBST(int[] nums) {
+        if(nums.length==0)
+            return null;
+        return biSearch(nums,0,nums.length-1);
+    }
+    
+    private TreeNode biSearch(int[] nums, int left, int right) {
+        if(left>right)
+            return null;
+        int mid = left+(right-left)/2;
+        TreeNode node = new TreeNode(nums[mid]);
+        node.left = biSearch(nums,left,mid-1);
+        node.right = biSearch(nums,mid+1,right);
+        return node;
+    }
+```
+
+###  118 杨辉三角
+
+```java
+public List<List<Integer>> generate(int numRows) {
+        List<List<Integer>> res = new ArrayList<>();
+        for(int i = 0;i<numRows;i++){
+            List<Integer> row = new ArrayList<>();
+            row.add(1);
+            for(int j = 1;j<i;j++){
+                List<Integer> lastRow = res.get(i-1);
+                row.add(lastRow.get(j-1)+lastRow.get(j));
+            }
+            if(i != 0)
+                row.add(1);
+            res.add(row);
+        }
+        return res;
+    }
+```
+
+### 121 买卖股票（单次）
+
+- min记录最小值
+- max记录最大差
+
+```java
+public int maxProfit(int[] prices) {
+        if(prices.length==1 || prices.length==0)
+            return 0;
+        int min = prices[0];
+        int max = 0;
+        for(int i = 1;i<prices.length;i++){
+            if(prices[i] < min){
+                min = prices[i];
+            }else{
+                max = Math.max(max,prices[i]-min);
+            }
+        }
+        return max;
+    }
+```
+
+### 122 买卖股票 II （多次）
+
+- 若是第i天价格比最小的大，则让max为第i天的价格
+- 若是第i天的价格比最大的小，说明，跌了
+- 则进行一次买卖，并且将最大的和最小的都重新归为第i天的价格
+- 别忘了最后还要买卖一次（因为可能递增到最后一天）
+
+```java
+public int maxProfit(int[] prices) {
+        if(prices.length == 0)
+            return 0;
+        int min = prices[0];
+        int max = prices[0];
+        int sum = 0;
+        for(int i = 1;i<prices.length;i++){
+            if(prices[i]<max){
+                sum += max-min;
+                min = prices[i];
+                max = prices[i];
+            }
+            if(prices[i]>min){
+                max = prices[i];
+            }
+        }
+        sum += max-min;
+        return sum;
+    }
+```
+
+### 125 验证字符串是否是回文
+
+- 用StringBuilder 解决
+
+```java
+public boolean isPalindrome(String s) {
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0;i<s.length();i++){
+            sb.append(Character.isDigit(s.charAt(i)) || Character.isAlphabetic(s.charAt(i))?s.charAt(i):"");
+        }
+        String origin = sb.toString().toLowerCase();
+        String reverse = sb.reverse().toString().toLowerCase();
+        return reverse.equals(origin);
+    }
+```
+
+### 136 求只出现了一次的数
+
+- 异或
+
+```java
+public int singleNumber(int[] nums) {
+        int ans = 0;
+        for(int i = 0;i<nums.length;i++){
+            ans^=nums[i];
+        }
+        return ans;
+    }
+```
+
+
+
+
+
+
+
 
 
 
