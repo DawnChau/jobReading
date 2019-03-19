@@ -194,7 +194,196 @@
 
 ### 24. ReentrantLock 和 Synchronized 的区别
 
+- synchronized是语法层面的，ReentrantLock是API层面的
+- ReentrantLock 等待可中断
+  - 使用tryLock 尝试锁定
+  - 可以实现公平锁
+  - 可以锁定多个条件
 
+### 25. 大端模式 小端模式
+
+- 大端模式：数据的高位存储在内存的低字节位
+- 小端模式：数据的高位存储咋内存的高字节位【小端模式更符合人的思想】
+
+### 26. equals与hashcode方法关系
+
+- 重写equals 必须重写hashcode
+- equals相等，hashcode必定相等
+- equals不相等，hashcode也可能相等
+
+### 27. MySQL 的引擎及区别
+
+- InnoDB：
+  - 对事务的支持
+  - 行级锁
+  - 外键约束
+- MyISAM：
+  - 表级锁
+  - 保存了表的行数
+  - 读操作多，且不需要事务，该引擎为首选
+
+### 28. 反射如何创建对象
+
+- 获取class对象
+  - 对象.getClass()
+  - 类.class
+  - Class.forName()
+- newInstance()
+
+### 29. LRU Cache 的原理
+
+- 最近最少使用
+- 链表：
+  - 新数据放到链表头部
+  - 缓存命中时候，数据放到链表头部
+  - 链表满时候，将链表尾部丢弃
+
+### 30. LinkedHashMap 底层实现
+
+- 和输入顺序一致
+- 内部使用双向链表
+- 自带LRUCache，开启之后，get会把其放到header前边
+- 第一个访问 -> 第二个访问 -> 第三个访问 -> header -> 最久没被访问
+
+### 31. 乐观锁，悲观锁的原理及应用场景
+
+- 乐观锁：拿数据的时候认为别人不会修改，所以不会上锁，更新的时候会判断一下数据在这期间有没有被更改
+  - 版本号
+  - 时间戳
+    - git的版本控制
+- 悲观锁：拿数据的时候就上锁
+  - DB的行锁，表锁
+
+### 32. HashMap 的初始容量及扩容过程
+
+- 负载因子 0.75
+- 默认初始容量是16
+- 扩容后增加为原来的一倍
+- 初始容量  （需要存储的元素个数/ 负载因子） +1
+- 扩容过程：
+  - 创建新的数组
+  - rehash
+- 多并发条件下的扩容可能会产生循环链表，导致get的时候进行死循环
+
+### 33. Callable 与 Future
+
+- 一般和ExecutorService 配合使用
+- Future 是一个接口，FutureTask是实现类。同时FutureTask还实现了Runnable
+- **推荐使用FutureTask，集成了Runnable和Callable的优点**
+
+### 34. 负载均衡的实现
+
+- 随机
+- 轮询
+- 加权轮询
+- 源地址哈希（静态映射）
+- 目标地址哈希（静态映射）
+- 一致性哈希
+- 最少连接
+
+### 35. AQS 的底层实现
+
+- AQS 管理着资源 state
+- AQS 管理着队列 CLH （双向链表）
+- 所有Lock 锁都是AQS的实现
+- 将node加入到CLH使用的是CAS，同时线程进入自旋状态
+- 自旋时候，判断如果不合适，就调用LockSupport.park(this)挂起
+- 前边的节点通过LockSupport.unpark(currentNode.next.thread)唤醒后续
+- 重入锁的最主要逻辑就锁判断上次获取锁的线程是否为当前线程
+- 读写锁的实现是将state分为高低16位，并且通过CAS更改
+
+### 36. beanFactory 和 factoryBean 的区别
+
+- factoryBean 是个 bean，但是这个Bean不是简单的Bean，而是一个能生产或者修饰对象的工厂Bean
+
+### 37. Spring mvc的流程
+
+- 用户请求DispatcherServlet
+- DispatcherServlet去HandlerMapping 处查找Handler
+- HandlerMapping 返回 HandlerExecutionChain
+- DispatcherServlet 请求 HandlerAdapter 执行Handler
+- Handler 执行结束后返回ModelAndView，并被HandlerAdapter 返回给DispatcherServlet
+- DispatcherServlet 请求 ViewResolver 解析
+- ViewResolver 返回 view对象
+- DispatcherServlet 将 view 交给前端渲染
+
+### 38. Spring Bean 的生命周期
+
+- 实例化 new
+- 按照Spring 上下文对Bean进行配置，IOC注入
+- 如果实现BeanNameAware，调用setBeanName(String)，此处传递Spring 配置文件中的Bean的id
+- 如果实现BeanFactoryAware，调用setBeanFactory(BeanFactory) 此处传递的是Spring 工厂自身
+- 如果实现ApplicationContextAware，调用setApplicationContext(ApplicationContext)，传入Spring上下文
+- 如果关联了BeanPostProcessor，则会调用postProcessBeforeInitialization(Object obj, String s)
+- 调用 init-method
+- 如果关联了BeanPostProcessor，则会调用postProcessAfterInitialization(Object obj, String s)
+- 如果实现了DisposableBean，调用destroy()
+- 调用destroy-method
+
+### 39. ConcurrentHashMap的size方法的问题
+
+- JDK 1.7 
+  - 不加锁尝试三次，如果结果一致，就返回
+  - 如果结果不一致，加锁
+- JDK 1.8
+  - 建议使用 mappingCount（），返回值是long
+  - 核心是sumCount（）
+  - 核心是通过对 baseCount 【volatile 类型】和 counterCell 进行 CAS 计算，最终通过baseCount 和遍历 countCell 数组得出size
+  - 并发量很高的情况下，CAS 失败的线程使用counterCell记录元素个数的变化
+
+### 40. Ajax 
+
+- 异步
+- 局部渲染
+- XMLHttpRequest
+
+### 41. JDK 11 新特性
+
+- var 类型推断
+- 字符串功能加强
+- 集合增加of，copyOf【不可变返回true】
+- HttpClient
+- **ZGC**
+  - GC 暂停时间不会超过10ms
+  - 既能处理小堆，也能处理大堆
+  - 使用读屏障，不使用写屏障
+  - 着色指针
+
+### 42. 工厂模式和简单工厂的区别
+
+- 简单工厂模式：只有一个工厂
+- 工厂模式：工厂也实现接口
+
+### 43. 线程池初始化参数
+
+- int corePoolSize => 核心线程数
+- int maximumPoolSize 最大线程数
+- long keepAliveTime 非核心闲置线程存活时间
+- TimeUnit unit 时间单位
+- BlockingQueue<Runnable> workQueue 阻塞队列
+- ThreadFactory threadFactory 线程工厂
+- RejectedExecutionHandler handler 异常处理策略
+- **核心线程满了进入workQueue**
+- **workQueue满了开启非核心线程**
+
+### 44. Servlet 的单例多线程机制
+
+- 通过线程池来响应多个请求
+- 同一个servlet的多个请求也是多线程的
+
+### 45. Java包里提供了哪些线程池
+
+- newCachedThreadPool：复用
+- newFIxedThreadPool：定长
+- newScheduledThreadPool：定长
+- newSingleThreadExecutor：单线程
+
+### 46. 判断数组中出现次数超过该数组一半的元素
+
+- leetcode 169
+
+- 中位数，排序 logN
+- res为第一个数，times记录次数，遍历数组，遇到一样的times++，不一样的times— ，当times等于0的时候，res重新指向
 
 
 
